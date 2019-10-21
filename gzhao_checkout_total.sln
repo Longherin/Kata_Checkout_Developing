@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.779
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gzhao_checkout_total", "gzhao_checkout_total\gzhao_checkout_total.csproj", "{F08F8F93-027E-4C9A-BEAA-7E2F02C654A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gzhao_checkout_total", "gzhao_checkout_total\gzhao_checkout_total.csproj", "{F08F8F93-027E-4C9A-BEAA-7E2F02C654A5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gzhao_checkout_total_test", "gzhao_checkout_total_test\gzhao_checkout_total_test.csproj", "{61BF464A-FE80-4D90-AF2F-592DCA809CBB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{F08F8F93-027E-4C9A-BEAA-7E2F02C654A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F08F8F93-027E-4C9A-BEAA-7E2F02C654A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F08F8F93-027E-4C9A-BEAA-7E2F02C654A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61BF464A-FE80-4D90-AF2F-592DCA809CBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61BF464A-FE80-4D90-AF2F-592DCA809CBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61BF464A-FE80-4D90-AF2F-592DCA809CBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61BF464A-FE80-4D90-AF2F-592DCA809CBB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

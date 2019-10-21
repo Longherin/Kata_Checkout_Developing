@@ -694,11 +694,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Longh\\source\\repos\\gzhao_checkout_total\\gzhao_checkout_total\\gzhao_checkout_total.csproj",
+      "projectUniqueName": "D:\\VisualStudioWorkspace\\gzhao_checkout_total\\gzhao_checkout_total\\gzhao_checkout_total.csproj",
       "projectName": "gzhao_checkout_total",
-      "projectPath": "C:\\Users\\Longh\\source\\repos\\gzhao_checkout_total\\gzhao_checkout_total\\gzhao_checkout_total.csproj",
+      "projectPath": "D:\\VisualStudioWorkspace\\gzhao_checkout_total\\gzhao_checkout_total\\gzhao_checkout_total.csproj",
       "packagesPath": "C:\\Users\\Longh\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Longh\\source\\repos\\gzhao_checkout_total\\gzhao_checkout_total\\obj\\",
+      "outputPath": "D:\\VisualStudioWorkspace\\gzhao_checkout_total\\gzhao_checkout_total\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

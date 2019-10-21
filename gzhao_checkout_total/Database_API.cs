@@ -1,0 +1,61 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace gzhao_checkout_total
+{
+    /// <summary>
+    /// This class stores a list of products.
+    /// </summary>
+    public class Database_API
+    {
+
+        private List<Item> items;
+
+        /// <summary>
+        /// Adds the input item into the currently existing list if an item
+        /// with the exact same name does not exist.
+        /// </summary>
+        /// <param name="item"></param>
+        public void AddToList(Item item)
+        {
+            bool duplicateExists = false;
+
+            int i = 0;
+            while (!duplicateExists)
+            {
+                duplicateExists = item.Match(items[i]);
+            }
+            if (!duplicateExists)
+            {
+                items.Add(item);
+            }
+        }
+
+        /// <summary>
+        /// Removes items of the exact same name from the list.
+        /// </summary>
+        /// <param name="itemName"></param>
+        public void RemoveFromList(string itemName)
+        {
+            int i = items.Count-1;
+            while(i >= 0)
+            {
+                if (items[i].name.Equals(itemName))
+                {
+                    items.RemoveAt(i);
+                }
+                i--;
+            }
+        }
+
+        /// <summary>
+        /// Returns the size of the item roster.
+        /// </summary>
+        /// <returns></returns>
+        public int ItemListCount()
+        {
+            return items.Count;
+        }
+    }
+}
