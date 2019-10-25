@@ -12,6 +12,11 @@ namespace gzhao_checkout_total
 
         private List<Item> items;
 
+        public Database_API()
+        {
+            items = new List<Item>();
+        }
+
         /// <summary>
         /// Adds the input item into the currently existing list if an item
         /// with the exact same name does not exist.
@@ -22,9 +27,10 @@ namespace gzhao_checkout_total
             bool duplicateExists = false;
 
             int i = 0;
-            while (!duplicateExists)
+            while (!duplicateExists && items.Count > 0)
             {
                 duplicateExists = item.Match(items[i]);
+                i++;
             }
             if (!duplicateExists)
             {
@@ -41,7 +47,7 @@ namespace gzhao_checkout_total
             int i = items.Count-1;
             while(i >= 0)
             {
-                if (items[i].name.Equals(itemName))
+                if (items[i].Match(itemName));
                 {
                     items.RemoveAt(i);
                 }

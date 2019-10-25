@@ -13,7 +13,7 @@ namespace gzhao_checkout_total_test
 
             roster.AddToList(new Item("Beef", 10, true));
 
-            Assert.AreEqual(roster.ItemListCount(), 1);
+            Assert.AreEqual(1,roster.ItemListCount());
         }
 
         [TestMethod]
@@ -25,7 +25,7 @@ namespace gzhao_checkout_total_test
 
             roster.RemoveFromList("Beef");
 
-            Assert.AreEqual(roster.ItemListCount(), 0);
+            Assert.AreEqual(0,roster.ItemListCount());
         }
 
         [TestMethod]
@@ -37,7 +37,7 @@ namespace gzhao_checkout_total_test
 
             roster.RemoveFromList("beef");
 
-            Assert.AreEqual(roster.ItemListCount(), 0);
+            Assert.AreEqual(0, roster.ItemListCount());
         }
     }
 }

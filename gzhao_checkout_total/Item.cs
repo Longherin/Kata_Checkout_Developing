@@ -47,5 +47,11 @@ namespace gzhao_checkout_total
             string tpName = name.ToLower();
             return mtName.Equals(tpName);
         }
+
+        public bool Match(string matchTarget)
+        {
+            Item tempItem = new Item(matchTarget, 0);
+            return Match(tempItem);
+        }
     }
 }

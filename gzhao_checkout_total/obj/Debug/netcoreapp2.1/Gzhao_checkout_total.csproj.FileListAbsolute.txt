@@ -1,0 +1,11 @@
+D:\VisualStudioWorkspace\gzhao_checkout_total\gzhao_checkout_total\bin\Debug\netcoreapp2.1\Gzhao_checkout_total.deps.json
+D:\VisualStudioWorkspace\gzhao_checkout_total\gzhao_checkout_total\bin\Debug\netcoreapp2.1\Gzhao_checkout_total.runtimeconfig.json
+D:\VisualStudioWorkspace\gzhao_checkout_total\gzhao_checkout_total\bin\Debug\netcoreapp2.1\Gzhao_checkout_total.runtimeconfig.dev.json
+D:\VisualStudioWorkspace\gzhao_checkout_total\gzhao_checkout_total\bin\Debug\netcoreapp2.1\Gzhao_checkout_total.dll
+D:\VisualStudioWorkspace\gzhao_checkout_total\gzhao_checkout_total\bin\Debug\netcoreapp2.1\Gzhao_checkout_total.pdb
+D:\VisualStudioWorkspace\gzhao_checkout_total\gzhao_checkout_total\obj\Debug\netcoreapp2.1\Gzhao_checkout_total.csprojAssemblyReference.cache
+D:\VisualStudioWorkspace\gzhao_checkout_total\gzhao_checkout_total\obj\Debug\netcoreapp2.1\Gzhao_checkout_total.csproj.CoreCompileInputs.cache
+D:\VisualStudioWorkspace\gzhao_checkout_total\gzhao_checkout_total\obj\Debug\netcoreapp2.1\Gzhao_checkout_total.AssemblyInfoInputs.cache
+D:\VisualStudioWorkspace\gzhao_checkout_total\gzhao_checkout_total\obj\Debug\netcoreapp2.1\Gzhao_checkout_total.AssemblyInfo.cs
+D:\VisualStudioWorkspace\gzhao_checkout_total\gzhao_checkout_total\obj\Debug\netcoreapp2.1\Gzhao_checkout_total.dll
+D:\VisualStudioWorkspace\gzhao_checkout_total\gzhao_checkout_total\obj\Debug\netcoreapp2.1\Gzhao_checkout_total.pdb

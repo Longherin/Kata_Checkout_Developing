@@ -3,9 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.779
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gzhao_checkout_total", "gzhao_checkout_total\gzhao_checkout_total.csproj", "{F08F8F93-027E-4C9A-BEAA-7E2F02C654A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gzhao_checkout_total", "gzhao_checkout_total\Gzhao_checkout_total.csproj", "{F08F8F93-027E-4C9A-BEAA-7E2F02C654A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gzhao_checkout_total_test", "gzhao_checkout_total_test\gzhao_checkout_total_test.csproj", "{61BF464A-FE80-4D90-AF2F-592DCA809CBB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gzhao_checkout_total_test", "gzhao_checkout_total_test\Gzhao_checkout_total_test.csproj", "{61BF464A-FE80-4D90-AF2F-592DCA809CBB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F08F8F93-027E-4C9A-BEAA-7E2F02C654A5} = {F08F8F93-027E-4C9A-BEAA-7E2F02C654A5}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
