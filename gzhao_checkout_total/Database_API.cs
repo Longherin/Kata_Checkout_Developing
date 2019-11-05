@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace gzhao_checkout_total
+namespace Gzhao_checkout_total
 {
     /// <summary>
     /// This class stores a list of products.
@@ -10,49 +10,41 @@ namespace gzhao_checkout_total
     public class Database_API
     {
 
-        private List<Item> items;
+        private PurchaseItemManager itemManager;
 
         public Database_API()
         {
-            items = new List<Item>();
+            itemManager = new PurchaseItemManager();
         }
-
+        
         /// <summary>
-        /// Adds the input item into the currently existing list if an item
-        /// with the exact same name does not exist.
+        /// Adds an item to the item manager. The amount is either the unit count
+        /// or else the weight of the item.
         /// </summary>
-        /// <param name="item"></param>
-        public void AddToList(Item item)
+        /// <param name="item">The name of the input item.</param>
+        /// <param name="amount">The unit count of the item (if not assessed by weight)
+        /// or the weight of the item.</param>
+        public void AddToList(string item, float amount)
         {
-            bool duplicateExists = false;
-
-            int i = 0;
-            while (!duplicateExists && items.Count > 0)
-            {
-                duplicateExists = item.Match(items[i]);
-                i++;
-            }
-            if (!duplicateExists)
-            {
-                items.Add(item);
-            }
+            itemManager.Add(item, amount);
         }
 
         /// <summary>
-        /// Removes items of the exact same name from the list.
+        /// Removes the most currrent item on the receipt with the given name.
         /// </summary>
         /// <param name="itemName"></param>
-        public void RemoveFromList(string itemName)
+        public void RemoveLast()
         {
-            int i = items.Count-1;
-            while(i >= 0)
-            {
-                if (items[i].Match(itemName));
-                {
-                    items.RemoveAt(i);
-                }
-                i--;
-            }
+            itemManager.RemoveLast();
+        }
+
+        /// <summary>
+        /// Removes the most current specific item on the receipt with the given name.
+        /// </summary>
+        /// <param name="item"></param>
+        public void RemoveSpecific(string item)
+        {
+            itemManager.RemoveSpecific(item);
         }
 
         /// <summary>
@@ -61,7 +53,7 @@ namespace gzhao_checkout_total
         /// <returns></returns>
         public int ItemListCount()
         {
-            return items.Count;
+            return itemManager.Total();
         }
     }
 }

@@ -2,15 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace gzhao_checkout_total
+namespace Gzhao_checkout_total
 {
-    public class Item
+    public class Item :Item_Super
     {
-        /// <summary>
-        /// Name of the item.
-        /// </summary>
-        public string name { get; private set; }
-
         /// <summary>
         /// Full price of the item.
         /// </summary>
@@ -35,23 +30,10 @@ namespace gzhao_checkout_total
             priceByWeight = sellByWeight;
         }
 
-        /// <summary>
-        /// Checks to see if the input item has the same name as this item.
-        /// Returns true if the two names match.
-        /// </summary>
-        /// <param name="matchTarget">The input item.</param>
-        /// <returns>True if both names match</returns>
-        public bool Match(Item matchTarget)
+        public override bool Match(string matchTarget)
         {
-            string mtName = matchTarget.name.ToLower();
-            string tpName = name.ToLower();
-            return mtName.Equals(tpName);
-        }
-
-        public bool Match(string matchTarget)
-        {
-            Item tempItem = new Item(matchTarget, 0);
-            return Match(tempItem);
+            string mt = matchTarget.ToLower();
+            return mt.Equals(name.ToLower());
         }
     }
 }

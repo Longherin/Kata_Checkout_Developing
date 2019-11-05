@@ -1,7 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using gzhao_checkout_total;
+using Gzhao_checkout_total;
 
-namespace gzhao_checkout_total_test
+namespace Gzhao_checkout_total_test
 {
     [TestClass]
     public class Database_API_Test
@@ -11,7 +11,7 @@ namespace gzhao_checkout_total_test
         {
             Database_API roster = new Database_API();
 
-            roster.AddToList(new Item("Beef", 10, true));
+            roster.AddToList("Beef", 10);
 
             Assert.AreEqual(1,roster.ItemListCount());
         }
@@ -21,9 +21,9 @@ namespace gzhao_checkout_total_test
         {
             Database_API roster = new Database_API();
 
-            roster.AddToList(new Item("Beef", 10, true));
+            roster.AddToList("Beef", 10);
 
-            roster.RemoveFromList("Beef");
+            roster.RemoveSpecific("Beef");
 
             Assert.AreEqual(0,roster.ItemListCount());
         }
@@ -33,11 +33,25 @@ namespace gzhao_checkout_total_test
         {
             Database_API roster = new Database_API();
 
-            roster.AddToList(new Item("Beef", 10, true));
+            roster.AddToList("Beef", 10);
 
-            roster.RemoveFromList("beef");
+            roster.RemoveSpecific("beef");
 
             Assert.AreEqual(0, roster.ItemListCount());
+        }
+
+        [TestMethod]
+        public void Test_Roster_Add_Remove_Last()
+        {
+            Database_API roster = new Database_API();
+
+            roster.AddToList("Beef", 10);
+            roster.AddToList("Chicken", 10);
+            roster.AddToList("Peas", 10);
+
+            roster.RemoveLast();
+
+            Assert.AreEqual(2, roster.ItemListCount());
         }
     }
 }
