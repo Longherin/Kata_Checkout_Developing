@@ -4,70 +4,77 @@ using System.Text;
 
 namespace Gzhao_checkout_total
 {
-    class SpecialsList
+    class Specials_API
     {
         private static List<Special> listOfSpecials = new List<Special>();
-
+        
         /// <summary>
-        /// Adds a special into the list of specials. No duplicate deals are allowed.
-        /// Honestly would work a lot better with a code rather than a string match but
-        /// apparently that's what I'm working with today.
+        /// Adds a special into the list of Specials.
         /// </summary>
-        /// <param name="input">The deal being added.</param>
-        public static void addSpecial(Special input)
+        /// <param name="special">The special being added.</param>
+        public void AddSpecial(Special special)
         {
-            bool hasDuplicate = false;
-            int i = 0;
-            while(!hasDuplicate && i < listOfSpecials.Count)
-            {
-                if (listOfSpecials[i].description.Equals(input.description))
-                {
-                    hasDuplicate = true;
-                }
-                i++;
-            }
-
-            if (!hasDuplicate)
-            {
-                listOfSpecials.Add(input);
-            }
+            listOfSpecials.Add(special);
         }
 
         /// <summary>
-        /// Removes a specific special from the list of specials.
-        /// Uses name matching.
+        /// Removes ALL Specials in the list that affects this item.
         /// </summary>
-        /// <param name="input"></param>
-        public static void removeSpecial(Special input)
+        /// <param name="name">The item being afected.</param>
+        public void RemoveSpecial(string name)
         {
             int i = listOfSpecials.Count;
-            bool removed = false;
-            while (i >= 0 && !removed)
+            while(i > 0)
             {
-                if (listOfSpecials[i].description.Equals(input.description))
+                i--;
+                if (listOfSpecials[i].Match(name))
                 {
                     listOfSpecials.RemoveAt(i);
                 }
-                i--;
             }
         }
 
         /// <summary>
-        /// removes the oldest special that involves the item involved.
+        /// Returns true if there is a deal that can be applied with the given
+        /// purchases.
         /// </summary>
-        /// <param name="input">the name of the item involved.</param>
-        public static void removeSpecial(string input)
+        /// <param name="talliedItems"></param>
+        /// <returns></returns>
+        internal static bool TryGetMatchingDeal(string name, int amount)
         {
-            int i = 0;
-            bool removed = false;
-            while(i < listOfSpecials.Count && !removed)
+            bool hasDeal = false;
+            
+            foreach(Special item in listOfSpecials)
             {
-                if (listOfSpecials[i].ContainsItem(input))
+                if (item.itemAffected.Equals(name) && item.activationRequirement == amount)
                 {
-                    listOfSpecials.RemoveAt(i);
+                    hasDeal = true;
+                    break;
                 }
-                i++;
             }
+
+            return hasDeal;
+        }
+
+        /// <summary>
+        /// Returns the deal that can be applied with the given purchases,
+        /// else it returns a null object.
+        /// </summary>
+        /// <param name="talliedItems"></param>
+        /// <returns></returns>
+        internal static Special GetMatchingDeal(string name, int amount)
+        {
+            Special special = new Special();
+            foreach(Special item in listOfSpecials)
+            {
+                if(item.itemAffected.Equals(name) && item.activationRequirement == amount)
+                {
+                    special = item;
+                    break;
+                }
+            }
+
+            return special;
         }
     }
 }

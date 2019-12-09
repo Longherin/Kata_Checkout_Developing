@@ -4,8 +4,13 @@ using System.Text;
 
 namespace Gzhao_checkout_total
 {
-    public class Item :Item_Super
+    public class Item
     {
+        /// <summary>
+        /// Name of the item.
+        /// </summary>
+        public string name { get; private set; }
+
         /// <summary>
         /// Full price of the item.
         /// </summary>
@@ -30,9 +35,15 @@ namespace Gzhao_checkout_total
             priceByWeight = sellByWeight;
         }
 
-        public override bool Match(string matchTarget)
+        /// <summary>
+        /// Returns true if this item has the same name as the given string.
+        /// Strings are sanitized for leading/trailing spaces and are case insensitive.
+        /// </summary>
+        /// <param name="matchTarget"></param>
+        /// <returns></returns>
+        public bool Match(string matchTarget)
         {
-            string mt = matchTarget.ToLower();
+            string mt = matchTarget.ToLower().Trim();
             return mt.Equals(name.ToLower());
         }
     }

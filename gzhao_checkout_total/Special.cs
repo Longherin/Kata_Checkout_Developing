@@ -10,61 +10,94 @@ namespace Gzhao_checkout_total
     class Special
     {
         /// <summary>
-        /// Not used for this demonstration, but this would be used for cases like
-        /// where deals are applied for company-wide products rather than just single
-        /// products.
+        /// The name of the item affected.
         /// </summary>
-        private List<string> tags;
+        public string itemAffected { get; private set; }
+        
+        /// <summary>
+        /// The type of a special.
+        /// FIXED = Set the affected item(s) to a fixed price.
+        /// PERCENTAGE = Set the affected item(s) to a percentage of their original price.
+        /// </summary>
+        public enum SPECIAL_TYPE : int {FIXED = 0, PERCENTAGE = 1}
 
         /// <summary>
-        /// All the items that are a part of this deal.
+        /// The type of this special.
         /// </summary>
-        private List<string> affectedItems;
+        private readonly SPECIAL_TYPE type;
+        
+        /// <summary>
+        /// The amount that this item is either:
+        /// FIXED = Set to
+        /// PERCENTAGE = Reduced by.
+        /// 
+        /// Note: for PERCENTAGE, 20 = 20% reduction in price.
+        /// </summary>
+        public float costChange { get; private set; }
 
         /// <summary>
-        /// How many items are affected by this special.
+        /// The amount of items that need to be purchased before this special fires.
         /// </summary>
-        private int affectedNumbers;
+        public int activationRequirement { get; private set; }
 
         /// <summary>
-        /// How many items are needed before this special can be applied.
+        /// The amount of items that this special applies to.
         /// </summary>
-        private int affectedLimit;
+        public int appliedToAmount { get; private set; }
 
-        /// <summary>
-        /// How many items in total can be affected by this special.
-        /// </summary>
-        private int affectedStart;
-
-        /// <summary>
-        /// The description of the deal.
-        /// </summary>
-        public string description { get; private set; }
-
-        /// <summary>
-        /// Create a new special deal.
-        /// </summary>
-        /// <param name="input">The description of the deal.</param>
-        /// <param name="numbers">How many items will be affected. -1 means 'all of it'.</param>
-        /// <param name="start">How many items are needed to start the deal. -1 means 'all of it.'</param>
-        /// <param name="limit">How many items in total are considered for this deal.</param>
-        public Special(string input, int numbers=-1, int start=-1, int limit=0)
+        public Special()
         {
-            description = input;
-            affectedNumbers = numbers;
-            affectedLimit = limit;
-            affectedStart = start;
+            itemAffected = "_NULL_ITEM";
+            type = SPECIAL_TYPE.FIXED;
+            costChange = 0;
+            activationRequirement = 255;
+            appliedToAmount = 0;
         }
 
         /// <summary>
-        /// Check if this special applies to the item given.
-        /// Returns true if that is the case.
+        /// Creates a new Special Deal.
         /// </summary>
-        /// <param name="input">The name of the item being given.</param>
-        /// <returns>Whether if the item applies to this special.</returns>
-        public bool ContainsItem(string input)
+        /// <param name="sp_name">The name of the item that this deal affects.</param>
+        /// <param name="specialType">The type of the special.</param>
+        /// <param name="cost">The change in value for this item.</param>
+        /// <param name="activateReq">How many we need before this special is applied.</param>
+        /// <param name="appliedAmt">How many items get applied this special after it activates.</param>
+        public Special(string sp_name, int specialType, float cost, int activateReq, int appliedAmt)
         {
-            return affectedItems.Contains(input);
+            itemAffected = sp_name;
+            type = (SPECIAL_TYPE)specialType;
+            costChange = cost;
+            activationRequirement = activateReq;
+            appliedToAmount = appliedAmt;
+        }
+        
+        /// <summary>
+        /// Returns true if this Special's affected item is the same as the string being given.
+        /// Case insensitive and culled for leading/trailing spaces.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public bool Match(string name)
+        {
+            string temp = name.ToLower().Trim();
+            return temp.Equals(itemAffected.ToLower());
+        }
+
+        /// <summary>
+        /// Returns true if this special is a percentage deal rather than
+        /// a fixed price change.
+        /// </summary>
+        /// <returns></returns>
+        public bool GetIsPercentage()
+        {
+            bool ret = false;
+
+            if(type == SPECIAL_TYPE.PERCENTAGE)
+            {
+                ret = true;
+            }
+
+            return ret;
         }
     }
 }

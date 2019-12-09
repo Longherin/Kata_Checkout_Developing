@@ -5,55 +5,68 @@ using System.Text;
 namespace Gzhao_checkout_total
 {
     /// <summary>
-    /// This class stores a list of products.
+    /// This class lets us interface with the 'database'.
     /// </summary>
     public class Database_API
     {
-
-        private PurchaseItemManager itemManager;
-
-        public Database_API()
-        {
-            itemManager = new PurchaseItemManager();
-        }
-        
         /// <summary>
-        /// Adds an item to the item manager. The amount is either the unit count
-        /// or else the weight of the item.
+        /// Adds an item to the list of items.
         /// </summary>
-        /// <param name="item">The name of the input item.</param>
-        /// <param name="amount">The unit count of the item (if not assessed by weight)
-        /// or the weight of the item.</param>
-        public void AddToList(string item, float amount)
+        /// <param name="name">Name of the item.</param>
+        /// <param name="cost">Cost of the item.</param>
+        /// <param name="sellByWeight">If true, the item price is dependent on its weight.</param>
+        public static void AddItem(string name, float cost, bool sellByWeight=false)
         {
-            itemManager.Add(item, amount);
+            Item newItem = new Item(name, cost, sellByWeight);
+            Database.AddItem(newItem);
         }
 
         /// <summary>
-        /// Removes the most currrent item on the receipt with the given name.
+        /// Removes all item entries of the same name from the list of items.
         /// </summary>
-        /// <param name="itemName"></param>
-        public void RemoveLast()
+        /// <param name="name"></param>
+        public static void Remove(string name)
         {
-            itemManager.RemoveLast();
+            Database.RemoveItem(name);
         }
 
         /// <summary>
-        /// Removes the most current specific item on the receipt with the given name.
+        /// Gets the item that matches the given search parameter
+        /// (in our case, the name of the item).
         /// </summary>
-        /// <param name="item"></param>
-        public void RemoveSpecific(string item)
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static Item GetItem(string name)
         {
-            itemManager.RemoveSpecific(item);
+            return Database.GetItem(name);
         }
 
         /// <summary>
-        /// Returns the size of the item roster.
+        /// Returns the price of an item given its name.
+        /// Will return 0 if the name is not in the list.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static float GetCost(string name)
+        {
+            return Database.GetCost(name);
+        }
+
+        /// <summary>
+        /// Gets the count of how many items are in the database.
         /// </summary>
         /// <returns></returns>
-        public int ItemListCount()
+        public static int Count()
         {
-            return itemManager.Total();
+            return Database.GetItemCount();
+        }
+
+        /// <summary>
+        /// Purges the item list. Use for testing only.
+        /// </summary>
+        public static void Clean()
+        {
+            Database.PurgeItems();
         }
     }
 }

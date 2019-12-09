@@ -9,49 +9,48 @@ namespace Gzhao_checkout_total_test
         [TestMethod]
         public void Test_Add_One_To_Roster()
         {
-            Database_API roster = new Database_API();
+            Database_API.AddItem("Beef", 10);
+            
+            Assert.AreEqual(1,Database_API.Count());
 
-            roster.AddToList("Beef", 10);
-
-            Assert.AreEqual(1,roster.ItemListCount());
+            Database_API.Clean();
         }
 
         [TestMethod]
         public void Test_Roster_Add_Remove()
         {
-            Database_API roster = new Database_API();
+            Database_API.AddItem("Beef", 10);
 
-            roster.AddToList("Beef", 10);
+            Database_API.Remove("Beef");
 
-            roster.RemoveSpecific("Beef");
+            Assert.AreEqual(0,Database_API.Count());
 
-            Assert.AreEqual(0,roster.ItemListCount());
+            Database_API.Clean();
         }
 
         [TestMethod]
-        public void Test_Roster_Add_Remove_Case()
+        public void Test_Roster_Add_Not_Duplicate()
         {
-            Database_API roster = new Database_API();
+            Database_API.AddItem("Beef", 10);
+            Database_API.AddItem("Beef", 10);
 
-            roster.AddToList("Beef", 10);
+            Assert.AreEqual(1, Database_API.Count());
 
-            roster.RemoveSpecific("beef");
-
-            Assert.AreEqual(0, roster.ItemListCount());
+            Database_API.Clean();
         }
 
         [TestMethod]
-        public void Test_Roster_Add_Remove_Last()
+        public void Test_Roster_Remove_One()
         {
-            Database_API roster = new Database_API();
+            Database_API.AddItem("Beef", 10);
+            Database_API.AddItem("Chicken", 10);
+            Database_API.AddItem("Peas", 10);
 
-            roster.AddToList("Beef", 10);
-            roster.AddToList("Chicken", 10);
-            roster.AddToList("Peas", 10);
+            Database_API.Remove("Beef");
 
-            roster.RemoveLast();
+            Assert.AreEqual(2, Database_API.Count());
 
-            Assert.AreEqual(2, roster.ItemListCount());
+            Database_API.Clean();
         }
     }
 }
