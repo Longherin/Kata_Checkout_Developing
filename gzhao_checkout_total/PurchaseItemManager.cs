@@ -12,14 +12,15 @@ namespace Gzhao_checkout_total
         /// Each item on the specials roster represents one special that the buyer
         /// qualifies for.
         /// </summary>
-        private List<Special> appliedSpecials;
+        private List<SpecialToken> appliedSpecials;
 
-        private SpecialManager spManager;
+        private Dictionary<string, int> itemRosterTally;
         
         public PurchaseItemManager()
         {
             itemRosterAsPurchased = new List<ItemInCart>();
-            spManager = new SpecialManager();
+            appliedSpecials = new List<SpecialToken>();
+            itemRosterTally = new Dictionary<string, int>();
         }
 
         /// <summary>
@@ -27,9 +28,21 @@ namespace Gzhao_checkout_total
         /// </summary>
         /// <param name="itemName">The item being purchased.</param>
         /// <param name="itemNumber">How many is being purchased.</param>
-        public void Add(string itemName, float itemNumber)
-        { 
-            itemRosterAsPurchased.Add(new ItemInCart(Database_API.GetItem(itemName), itemNumber));
+        public void Add(string itemName, float itemNumber=1)
+        {
+            ItemInCart newItem = new ItemInCart(Database_API.GetItem(itemName), itemNumber);
+            string itemNameClean = newItem.GetName();
+            itemRosterAsPurchased.Add(newItem);
+
+            if (itemRosterTally.ContainsKey(itemNameClean))
+            {
+                itemRosterTally[itemNameClean]++;
+            }
+            else
+            {
+                itemRosterTally.Add(itemNameClean, 1);
+            }
+
             Tally();
         }
 
@@ -38,7 +51,11 @@ namespace Gzhao_checkout_total
         /// </summary>
         public void RemoveLast()
         {
+            string name = itemRosterAsPurchased[itemRosterAsPurchased.Count - 1].GetName();
             itemRosterAsPurchased.RemoveAt(itemRosterAsPurchased.Count - 1);
+
+            itemRosterTally[name]--;
+
             Tally();
         }
 
@@ -49,6 +66,8 @@ namespace Gzhao_checkout_total
         public void RemoveSpecific(string itemName)
         {
             int i = itemRosterAsPurchased.Count;
+            string name = "";
+
             while(i > 0)
             {
                 i--;
@@ -57,10 +76,16 @@ namespace Gzhao_checkout_total
 
                 if(match)
                 {
+                    name = itemRosterAsPurchased[i].GetName();
+
                     itemRosterAsPurchased.RemoveAt(i);
+                    
                     break;
                 }
             }
+
+            itemRosterTally[name]--;
+
             Tally();
         }
 
@@ -89,11 +114,50 @@ namespace Gzhao_checkout_total
         }
 
         /// <summary>
+        /// The total cost of this purchase without any specials attached.
+        /// </summary>
+        /// <returns></returns>
+        public float TotalNoSpecialPurchase()
+        {
+            float total = 0;
+            foreach(ItemInCart item in itemRosterAsPurchased)
+            {
+                total += item.GetOriginalPrice();
+            }
+
+            return total;
+        }
+
+        /// <summary>
+        /// Get the name of a product at the current pointer.
+        /// </summary>
+        /// <param name="pointer"></param>
+        /// <returns></returns>
+        public ItemInCart GetAtPosition(int pointer)
+        {
+            return itemRosterAsPurchased[pointer];
+            
+        }
+
+        /// <summary>
         /// Updates the tallied item's costs with respect to what specials they have applied.
         /// </summary>
         private void Tally()
         {
-            SpecialManager.ReadAndApply(itemRosterAsPurchased);
+            PurgeSpecials();
+            appliedSpecials = SpecialManager.ReadAndApply(itemRosterTally);
+            SpecialManager.ReadAndApplyDeals(appliedSpecials, itemRosterAsPurchased);
+        }
+
+        /// <summary>
+        /// Clean the special tag from all currently purchased items.
+        /// </summary>
+        private void PurgeSpecials()
+        {
+            foreach(ItemInCart item in itemRosterAsPurchased)
+            {
+                item.ClearSpecial();
+            }
         }
     }
 }

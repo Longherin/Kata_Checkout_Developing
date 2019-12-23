@@ -56,9 +56,18 @@ namespace Gzhao_checkout_total
         /// Gets the count of how many items are in the database.
         /// </summary>
         /// <returns></returns>
-        public static int Count()
+        public static int GetItemCount()
         {
             return Database.GetItemCount();
+        }
+
+        /// <summary>
+        /// Gets the count of how many specials are in the database.
+        /// </summary>
+        /// <returns></returns>
+        public static int GetSpecialsCount()
+        {
+            return Database.GetSpecialCount();
         }
 
         /// <summary>
@@ -67,6 +76,91 @@ namespace Gzhao_checkout_total
         public static void Clean()
         {
             Database.PurgeItems();
+        }
+
+        /// <summary>
+        /// Adds a special to the database.
+        /// </summary>
+        /// <param name="s"></param>
+        public static void AddSpecial(Special s)
+        {
+            Database.AddSpecial(s);
+        }
+
+        public static Special GetSpecial(string v)
+        {
+            Special ret = new Special();
+            bool matchFound = false;
+            int i = 0;
+            while(!matchFound && i < Database.GetSpecialCount())
+            {
+                matchFound = Database.GetSpecialAt(i).Match(v);
+                if (matchFound)
+                {
+                    ret = Database.GetSpecialAt(i);
+                }
+                i++;
+            }
+
+            return ret;
+        }
+
+        /// <summary>
+        /// remove all specials that affect the given item from the database.
+        /// </summary>
+        /// <param name="name"></param>
+        public static void RemoveSpecial(string name)
+        {
+            Database.RemoveSpecial(name);
+        }
+
+        /// <summary>
+        /// Returns true if there is a deal that can be applied with the given
+        /// purchases.
+        /// </summary>
+        /// <param name="talliedItems"></param>
+        /// <returns></returns>
+        internal static bool TryGetMatchingDeal(string name, int amount)
+        {
+            bool hasDeal = false;
+            int i = Database.GetSpecialCount();
+
+            for(int j = 0; j < i; j++)
+            {
+                Special item = Database.GetSpecialAt(j);
+                if(item.Match(name) && item.activationRequirement <= amount)
+                {
+                    hasDeal = true;
+                    break;
+                }
+            }
+
+            return hasDeal;
+        }
+        
+        /// <summary>
+        /// Returns a deal that can be applied to the given purchase.
+        /// Takes the name of the item for matching and the amount of purchases
+        /// for checking activation.
+        /// </summary>
+        /// <param name="name">The name of the item that's looking for a special.</param>
+        /// <param name="amount">The amount of the item that have been purchased so far.</param>
+        /// <returns></returns>
+        internal static Special GetMatchingDeal(string name, int amount)
+        {
+            Special special = new Special();
+            int i = Database.GetSpecialCount();
+            for(int j = 0; j < GetSpecialsCount(); j++)
+            {
+                Special item = Database.GetSpecialAt(j);
+                if(item.Match(name) && item.activationRequirement <= amount)
+                {
+                    special = item;
+                    break;
+                }
+            }
+
+            return special;
         }
     }
 }

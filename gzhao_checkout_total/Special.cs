@@ -7,7 +7,7 @@ namespace Gzhao_checkout_total
     /// <summary>
     /// A special is a deal that exists for a certain amount of items.
     /// </summary>
-    class Special
+    public class Special
     {
         /// <summary>
         /// The name of the item affected.
@@ -23,6 +23,8 @@ namespace Gzhao_checkout_total
 
         /// <summary>
         /// The type of this special.
+        /// 0 = Fixed price (change price to this value)
+        /// 1 = Percentage price (reduce price by this value)
         /// </summary>
         private readonly SPECIAL_TYPE type;
         
@@ -55,7 +57,12 @@ namespace Gzhao_checkout_total
         }
 
         /// <summary>
-        /// Creates a new Special Deal.
+        /// Creates a new Special Deal with the following parameters:
+        /// The name of the item, 
+        /// The type of the special (fixed or not),
+        /// The change in value for the item,
+        /// How many are needed before the special is applied,
+        /// How many items actually get this special.
         /// </summary>
         /// <param name="sp_name">The name of the item that this deal affects.</param>
         /// <param name="specialType">The type of the special.</param>

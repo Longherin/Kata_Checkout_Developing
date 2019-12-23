@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Gzhao_checkout_total
 {
-    class ItemInCart
+    public class ItemInCart
     {
         /// <summary>
         /// The item that's being purchased.
@@ -40,14 +40,27 @@ namespace Gzhao_checkout_total
         /// Changes this item's price based on the special as given.
         /// </summary>
         /// <param name="special"></param>
-        public void AffectedBySpecial(Special special)
+        public bool SetSpecialValue(Special special)
         {
+            bool flagSet = false;
             if (!isDiscounted)
             {
                 isDiscounted = true;
                 isPercentage = special.GetIsPercentage();
                 changeAmount = special.costChange;
+                flagSet = true;
             }
+
+            return flagSet;
+        }
+
+        /// <summary>
+        /// Removes this item's special marker.
+        /// </summary>
+        public void ClearSpecial()
+        {
+            isDiscounted = false;
+            isPercentage = false;
         }
 
         /// <summary>
@@ -78,6 +91,11 @@ namespace Gzhao_checkout_total
         public float GetPrice()
         {
             float total = itemRef.price;
+            if (itemRef.priceByWeight)
+            {
+                total *= quantity;
+            }
+
             if (isDiscounted)
             {
                 if (!isPercentage)
@@ -86,13 +104,20 @@ namespace Gzhao_checkout_total
                 }
                 else
                 {
-                    total *= (100 - changeAmount)*0.01f;
+                    total *= (100 - changeAmount) * 0.01f;
                 }
             }
+            return total;
+        }
+
+        public float GetOriginalPrice()
+        {
+            float total = itemRef.price;
             if (itemRef.priceByWeight)
             {
                 total *= quantity;
             }
+
             return total;
         }
     }

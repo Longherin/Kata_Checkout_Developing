@@ -11,7 +11,7 @@ namespace Gzhao_checkout_total_test
         {
             Database_API.AddItem("Beef", 10);
             
-            Assert.AreEqual(1,Database_API.Count());
+            Assert.AreEqual(1,Database_API.GetItemCount());
 
             Database_API.Clean();
         }
@@ -23,7 +23,7 @@ namespace Gzhao_checkout_total_test
 
             Database_API.Remove("Beef");
 
-            Assert.AreEqual(0,Database_API.Count());
+            Assert.AreEqual(0,Database_API.GetItemCount());
 
             Database_API.Clean();
         }
@@ -34,7 +34,7 @@ namespace Gzhao_checkout_total_test
             Database_API.AddItem("Beef", 10);
             Database_API.AddItem("Beef", 10);
 
-            Assert.AreEqual(1, Database_API.Count());
+            Assert.AreEqual(1, Database_API.GetItemCount());
 
             Database_API.Clean();
         }
@@ -48,7 +48,7 @@ namespace Gzhao_checkout_total_test
 
             Database_API.Remove("Beef");
 
-            Assert.AreEqual(2, Database_API.Count());
+            Assert.AreEqual(2, Database_API.GetItemCount());
 
             Database_API.Clean();
         }

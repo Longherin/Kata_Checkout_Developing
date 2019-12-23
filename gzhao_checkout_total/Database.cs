@@ -30,7 +30,7 @@ namespace Gzhao_checkout_total
         {
             int itemTgt = -1;
             int i = 0;
-            while (itemTgt != -1 && i < listOfItems.Count)
+            while (itemTgt == -1 && i < listOfItems.Count)
             {
                 if (listOfItems[i].Match(name))
                 {
@@ -124,6 +124,70 @@ namespace Gzhao_checkout_total
         internal static void PurgeItems()
         {
             listOfItems = new List<Item>();
+        }
+
+        /// <summary>
+        /// Adds a special to the database of specials.
+        /// If there exists a special that affects the same item as the new
+        /// incoming special, the old one is removed in favor of the new one.
+        /// </summary>
+        /// <param name="s"></param>
+        internal static void AddSpecial(Special s)
+        {
+            int i = listOfSpecials.Count;
+            bool changed = false;
+            while(i > 0 && !changed)
+            {
+                i--;
+                if (listOfSpecials[i].Match(s.itemAffected))
+                {
+                    listOfSpecials.RemoveAt(i);
+                    listOfSpecials.Add(s);
+                    changed = true;
+                }
+            }
+
+            //If it's just not in the list.
+            if (!changed)
+            {
+                listOfSpecials.Add(s);
+            }
+        }
+
+        /// <summary>
+        /// Removes all specials that affect the item with the given name.
+        /// </summary>
+        /// <param name="name"></param>
+        internal static void RemoveSpecial(string name)
+        {
+            int i = listOfSpecials.Count;
+            while (i > 0)
+            {
+                i--;
+                if (listOfSpecials[i].Match(name))
+                {
+                    listOfSpecials.RemoveAt(i);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the total count of specials in the list.
+        /// </summary>
+        /// <returns></returns>
+        internal static int GetSpecialCount()
+        {
+            return listOfSpecials.Count;
+        }
+
+        /// <summary>
+        /// Gets a special at the given position.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
+        internal static Special GetSpecialAt(int position)
+        {
+            return listOfSpecials[position];
         }
     }
 }
