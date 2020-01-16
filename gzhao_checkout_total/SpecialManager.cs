@@ -6,151 +6,100 @@ namespace Gzhao_checkout_total
 {
     public class SpecialManager
     {
-        
         /// <summary>
-        /// Reads the list of purchases and applies any applicable specials that
-        /// are discovered. The specials applied are returned.
+        /// Applies the specials in the list of tokens into the list of items.
+        /// Specials are applied top-down the list.
         /// </summary>
-        /// <param name="purchases">The applied specials.</param>
-        /// <returns></returns>
-        public static List<SpecialToken> ReadAndApply(Dictionary<string, int> talliedItems)
+        /// <param name="itemRosterAsPurchased">The list of purchased items (in entries).</param>
+        /// <param name="listOfApplyingSpecials">The list of applying specials.</param>
+        internal static void ApplySpecials(List<ItemInCart> itemRosterAsPurchased, SpecialTokenManager stm)
         {
-            SpecialTokenManager appliedDeals = new SpecialTokenManager();
-            
-            //Check to see if the quantity of our purchases qualify for specials.
-            foreach (KeyValuePair<string, int> spItem in talliedItems)
-            {
-                int check = spItem.Value;       //This is the item count.
-                int specialLimit = -1;          //This is the amt of items needed for a special to fire.
-                                                //At -1, it is a dummy flag.
-                bool allClear = false;          //When true, we've done all the checks possible.
-                while (!allClear)
-                {
-                    //In event of needing a special to trigger multiple times.
-                    if (Database_API.TryGetMatchingDeal(spItem.Key, check))
-                    {
-                        Special special = Database_API.GetMatchingDeal(spItem.Key, check);
-                        appliedDeals.Add(special, special.activationRequirement);
-
-                        specialLimit = special.activationRequirement;
-
-                    }
-                    if (specialLimit != -1 && check >= specialLimit)
-                    {
-                        //If we have enough to activate the special again, continue loop.
-                        check -= specialLimit;
-                    }
-                    else
-                    {
-                        //Break from loop.
-                        allClear = true;
-                    }
-                }
-            }
-            
-            return appliedDeals.GetTokensAsList();
-        }
-
-        /// <summary>
-        /// Actually applies the deals as given into the list of purchases.
-        /// </summary>
-        /// <param name="appliedDeals"></param>
-        /// <param name="purchases"></param>
-        public static void ReadAndApplyDeals(List<SpecialToken> inputList, List<ItemInCart> purchases)
-        {
-            //currently, we have: a list of purchases, and a list of specials.
-            //We need: a list of the most expensive items we've purchased.
-            //The size of the list is the same as the amount of items we have to cover.
-            SpecialTokenManager appliedDeals = new SpecialTokenManager(inputList);
-
-            Stack<ItemInCart> t_list = new Stack<ItemInCart>();
             int i = 0;
-            while (i < appliedDeals.GetTokenListSize())
+
+            while (i < stm.GetTokenListSize())
             {
-                //Iterate through the Specials.
-                foreach (ItemInCart item in purchases)
+                SpecialToken token = stm.GetToken(i);
+                //with this token, we will: apply bonuses to items top-down.
+
+                //The items that this special affects. ALL OF IT.
+                Queue<ItemInCart> appliedRoster = new Queue<ItemInCart>();
+                
+                foreach(ItemInCart item in itemRosterAsPurchased)
                 {
-                    //Iterate through the purchases.
-                    if (item.Match(appliedDeals.GetTokenAt(i).GetAffected()))
+                    if (token.CanBeAppliedTo(item))
                     {
-                        //If we have an item that matches, toss it into the list.
-                        t_list = AddLargest(item, t_list);
+                        appliedRoster.Enqueue(item);
                     }
                 }
+                //The list now only has items that qualify for the special.
                 
-                ApplySpecials(t_list, appliedDeals.GetTokenAt(i));
+                //Sorted by highest price to the lowest.
+                Queue<ItemInCart> sortedRoster = SortByPrice(appliedRoster);
+
+                bool header = true;
+                int fireCount = token.GetAffectedCount();
+                while (sortedRoster.Count > 0 && fireCount > 0)
+                {
+                    ItemInCart sri = sortedRoster.Dequeue();
+                    if (token.special.special_type == Special.SPECIAL_TT.DEFERRED && header)
+                    {
+                        //if it's deferred, the first item that qualifies for the special would be
+                        //the most expensive, and thus the qualifing item that doesn't get
+                        //the deal. Ergo, it's the header.
+                        sri.SetDeferHeader();
+                        header = false;
+                    }
+                    else if (!sri.isDiscounted)
+                    {
+                        sri.SetSpecialValue(token.special);
+                    }
+                    fireCount--;
+                }
                 i++;
             }
-             
         }
 
         /// <summary>
-        /// Creates a stack of the hardcap size. The priciest items belonging to the given
-        /// stack are placed into the returning stack.
+        /// Sorts the incoming queue and returns it with the most expensive item on top.
         /// </summary>
-        /// <param name="item">The item being compared.</param>
-        /// <param name="stack">The stack of special items we're adding into. Highest price is added first.</param>
-        private static Stack<ItemInCart> AddLargest(ItemInCart item, Stack<ItemInCart> stack)
+        /// <param name="queue"></param>
+        /// <returns></returns>
+        private static Queue<ItemInCart> SortByPrice(Queue<ItemInCart> queue)
         {
-            Queue<ItemInCart> q = new Queue<ItemInCart>();
-            int i = stack.Count;
+            Queue<ItemInCart> result = new Queue<ItemInCart>();
+            List<ItemInCart> list = new List<ItemInCart>();
 
-            while(stack.Count > 0)
+            ItemInCart hold = null;
+            while(queue.Count > 0)
             {
-                q.Enqueue(stack.Pop());
-            }
-            
-            ItemInCart smallest = item;
-            while (i > 0)
-            {
-                //The iterating item.
-                ItemInCart thing = q.Dequeue();
+                hold = queue.Dequeue();
 
-                if(thing.GetPrice() < smallest.GetPrice())
+                int i = 0;
+                
+                while(i < list.Count)
                 {
-                    //If the current item is smaller than the comparator, pop it back into the list.
-                    q.Enqueue(thing);
+                    ItemInCart item = list[i];
+                    if(hold.GetOriginalPrice() > item.GetOriginalPrice())
+                    {
+                        list[i] = hold;
+                        hold = item;
+                    }
+
+                    i++;
                 }
-                else
-                {
-                    //If the newcomer is smaller, add it into the list.
-                    //The dequeued item is now the 'next smallest' item.
-                    q.Enqueue(smallest);
-                    smallest = thing;
-                }
-                i--;
+
+                //At the end, hold has to be added to the list, so...
+                list.Add(hold);
             }
 
-            q.Enqueue(smallest);
-            Stack<ItemInCart> ret = new Stack<ItemInCart>();
-             
-            while(q.Count > 0)
+            int j = 0;
+            while(j < list.Count)
             {
-                ret.Push(q.Dequeue());
+                result.Enqueue(list[j]);
+                j++;
             }
 
-            return ret;
+            return result;
         }
-        
-        /// <summary>
-        /// Actually apply the specials to the items in the cart.
-        /// Items that already have specials are not counted.
-        /// </summary>
-        /// <param name="inCart"></param>
-        /// <param name="special"></param>
-        private static void ApplySpecials(Stack<ItemInCart> inCart, SpecialToken special)
-        {
-            int i = special.affectCount;
-            while(i > 0 && inCart.Count > 0)
-            {
-                ItemInCart item = inCart.Pop();
-                if (item.SetSpecialValue(special.special))
-                {
-                    i--;
-                }
-            }
-        }
-
-        
     }
 }

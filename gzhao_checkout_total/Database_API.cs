@@ -42,6 +42,16 @@ namespace Gzhao_checkout_total
         }
 
         /// <summary>
+        /// Gets the item that exists at the given pointer location in the database.
+        /// </summary>
+        /// <param name="pointer"></param>
+        /// <returns></returns>
+        public static Item GetItem(int pointer)
+        {
+            return Database.GetItemAt(pointer);
+        }
+
+        /// <summary>
         /// Returns the price of an item given its name.
         /// Will return 0 if the name is not in the list.
         /// </summary>
@@ -87,6 +97,11 @@ namespace Gzhao_checkout_total
             Database.AddSpecial(s);
         }
 
+        /// <summary>
+        /// Gets the special that affects the item with the given name.
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
         public static Special GetSpecial(string v)
         {
             Special ret = new Special();
@@ -94,15 +109,25 @@ namespace Gzhao_checkout_total
             int i = 0;
             while(!matchFound && i < Database.GetSpecialCount())
             {
-                matchFound = Database.GetSpecialAt(i).Match(v);
+                matchFound = Database.GetSpecialAtPosition(i).Match(v);
                 if (matchFound)
                 {
-                    ret = Database.GetSpecialAt(i);
+                    ret = Database.GetSpecialAtPosition(i);
                 }
                 i++;
             }
 
             return ret;
+        }
+
+        /// <summary>
+        /// Gets the special that has the given ID.
+        /// </summary>
+        /// <param name=""></param>
+        /// <returns></returns>
+        public static Special GetSpecial(int i)
+        {
+            return Database.GetSpecialAt(i);
         }
 
         /// <summary>
@@ -116,7 +141,7 @@ namespace Gzhao_checkout_total
 
         /// <summary>
         /// Returns true if there is a deal that can be applied with the given
-        /// purchases.
+        /// purchase and the amount of items within said purchase.
         /// </summary>
         /// <param name="talliedItems"></param>
         /// <returns></returns>
@@ -127,8 +152,8 @@ namespace Gzhao_checkout_total
 
             for(int j = 0; j < i; j++)
             {
-                Special item = Database.GetSpecialAt(j);
-                if(item.Match(name) && item.activationRequirement <= amount)
+                Special item = Database.GetSpecialAtPosition(j);
+                if(item.Match(name) && item.itemsNeededToFire <= amount)
                 {
                     hasDeal = true;
                     break;
@@ -152,8 +177,8 @@ namespace Gzhao_checkout_total
             int i = Database.GetSpecialCount();
             for(int j = 0; j < GetSpecialsCount(); j++)
             {
-                Special item = Database.GetSpecialAt(j);
-                if(item.Match(name) && item.activationRequirement <= amount)
+                Special item = Database.GetSpecialAtPosition(j);
+                if(item.Match(name) && item.itemsNeededToFire <= amount)
                 {
                     special = item;
                     break;
@@ -162,5 +187,7 @@ namespace Gzhao_checkout_total
 
             return special;
         }
+
+        
     }
 }

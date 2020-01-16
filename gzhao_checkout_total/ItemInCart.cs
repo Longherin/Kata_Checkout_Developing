@@ -21,14 +21,18 @@ namespace Gzhao_checkout_total
         /// If true, this item's price has been discounted.
         /// </summary>
         public bool isDiscounted { get; private set; }
+
         /// <summary>
-        /// When true, the affected item is affected by a percentage change to its price.
+        /// If true, this item is considered to be the header item
+        /// of a deferred special. It gets no discounts, but causes other
+        /// items in its class to get discounts.
         /// </summary>
-        private bool isPercentage;
+        public bool isDeferHeader { get; private set; }
+
         /// <summary>
-        /// The amount that this purchase is being changed by.
+        /// The special that this item is affected by.
         /// </summary>
-        private float changeAmount;
+        public int special_ID { get; private set; }
 
         public ItemInCart(Item item, float amt = 1)
         {
@@ -46,8 +50,7 @@ namespace Gzhao_checkout_total
             if (!isDiscounted)
             {
                 isDiscounted = true;
-                isPercentage = special.GetIsPercentage();
-                changeAmount = special.costChange;
+                special_ID = special.sp_ID;
                 flagSet = true;
             }
 
@@ -55,12 +58,21 @@ namespace Gzhao_checkout_total
         }
 
         /// <summary>
+        /// Sets this item as a deferred special header.
+        /// </summary>
+        public void SetDeferHeader()
+        {
+            isDeferHeader = true;
+        }
+
+        /// <summary>
         /// Removes this item's special marker.
         /// </summary>
         public void ClearSpecial()
         {
+            isDeferHeader = false;
             isDiscounted = false;
-            isPercentage = false;
+            special_ID = -1;
         }
 
         /// <summary>
@@ -96,15 +108,21 @@ namespace Gzhao_checkout_total
                 total *= quantity;
             }
 
-            if (isDiscounted)
+            if (isDiscounted && !isDeferHeader)
             {
-                if (!isPercentage)
+                Special refer = Database_API.GetSpecial(special_ID);
+
+                switch (refer.discount_type)
                 {
-                    total = changeAmount;
-                }
-                else
-                {
-                    total *= (100 - changeAmount) * 0.01f;
+                    case Special.DISCOUNT_TYPE.REDUCE_BY_DOLLAR:
+                        total -= refer.itemCostChange;
+                        break;
+                    case Special.DISCOUNT_TYPE.REDUCE_BY_PERCENTAGE:
+                        total *= (100 - refer.itemCostChange) * 0.01f;
+                        break;
+                    case Special.DISCOUNT_TYPE.SET_TO_AMOUNT:
+                        total = refer.itemCostChange;
+                        break;
                 }
             }
             return total;

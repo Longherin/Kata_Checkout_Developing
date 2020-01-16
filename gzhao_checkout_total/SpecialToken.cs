@@ -17,61 +17,140 @@ namespace Gzhao_checkout_total
         public int affectCount { get; private set; }
 
         /// <summary>
+        /// The total amount of times this special has been invoked.
+        /// </summary>
+        public int fireCount { get; private set; }
+
+        /// <summary>
+        /// The total amount of times this special may be invoked per purchase.
+        /// </summary>
+        private int fireLimit;
+
+        /// <summary>
         /// Create a new special token that represents the given special.
         /// </summary>
         /// <param name="sp">The Special that is being represented.</param>
-        /// <param name="items">The total amount of items this special is representing.</param>
-        public SpecialToken(Special sp, int items)
+        /// <param name="amount">The something or other that does a thing but for the time
+        /// being I'm too lazy to look up.</param>
+        public SpecialToken(Special sp)
         {
             special = sp;
-            BuildCount(items);
+            fireLimit = sp.specialApplyLimit;
+            fireCount = 1;
+            BuildAffectValue();
         }
 
         /// <summary>
-        /// builds the total amount of items this Special should affect.
+        /// Creates a new special token with a dummy special.
         /// </summary>
-        /// <param name="items"></param>
-        private void BuildCount(int items)
+        public SpecialToken()
         {
-            //How many items we have to deal with.
-            int cap = items;
-            //How many items we get to give the special to.
-            //Doing it this way to account for multiple "3 for 5" deals.
-            int applied = 0;
-            
-            while (cap > 0)
-            {
-                //Reduce the cap to remove one set from consideration.
-                cap -= special.activationRequirement;
+            special = new Special();
+            fireLimit = special.specialApplyLimit;
+            fireCount = 1;
+            BuildAffectValue();
+        }
 
-                if (cap >= 0)
-                {
-                    //If we removed a set and have enough left over
-                    //then we have enough to apply this special.
-                    applied += special.appliedToAmount;
-                }
+        /// <summary>
+        /// Set the amount of items this special should apply.
+        /// </summary>
+        private void BuildAffectValue()
+        {
+            affectCount = special.itemsApplied * fireLimit;
+        }
+
+        /// <summary>
+        /// Increase the fire value of this special by one.
+        /// The limit is handled on get, so don't worry about it here.
+        /// </summary>
+        public void Increment()
+        {
+            fireCount++;
+        }
+
+        /// <summary>
+        /// Decrease the fire value of this special by one.
+        /// </summary>
+        public void Decrement()
+        {
+            fireCount--;
+        }
+
+        /// <summary>
+        /// Returns true if the special of this token affects 
+        /// the given item.
+        /// </summary>
+        /// <param name="name">The name of the item being affected.</param>
+        /// <returns></returns>
+        public bool Match(string name)
+        {
+            return special.Match(name);
+        }
+
+        /// <summary>
+        /// Compares the item given with the parameters of this special,
+        /// returns true if the item does indeed apply to the special.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public bool CanBeAppliedTo(ItemInCart item)
+        {
+            bool result = false;
+            //what do we care about?
+            //1. If we're affecting the same item.
+            //2. If the price is lower than...what.
+
+            if (special.Match(item.GetName()))
+            {
+                result = true;
             }
 
-            affectCount = applied;
+            return result;
         }
 
         /// <summary>
-        /// Same Match operator as the Special variable this Token manages.
+        /// Compares the item given with the given name,
+        /// returns true if the special can be applied to the given item name.
         /// </summary>
-        /// <param name="itemType"></param>
+        /// <param name="item"></param>
         /// <returns></returns>
-        public bool Match(string itemType)
+        public bool CanBeAppliedTo(string item)
         {
-            return special.Match(itemType);
+            bool result = false;
+            //what do we care about?
+            //1. If we're affecting the same item.
+            //2. If the price is lower than...what.
+
+            if (special.Match(item))
+            {
+                result = true;
+            }
+
+            return result;
         }
 
         /// <summary>
-        /// returns the affected item of the special of this Token.
+        /// Returns the total number of items this special can be applied.
         /// </summary>
-        /// <returns></returns>
-        public string GetAffected()
+        /// <returns>fireCount * itemsApplied.</returns>
+        public int GetAffectedCount()
         {
-            return special.itemAffected;
+            int fire = fireCount;
+            if(fireCount > fireLimit && fireLimit != -1)
+            {
+                fire = fireLimit;
+            }
+
+            return fire * special.itemsApplied;
+        }
+        
+        /// <summary>
+        /// Sets an item to have this token's special.
+        /// </summary>
+        /// <param name="item"></param>
+        public void SetSpecial(ItemInCart item)
+        {
+            item.SetSpecialValue(special);
         }
     }
 }

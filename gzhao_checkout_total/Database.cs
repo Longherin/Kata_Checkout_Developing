@@ -172,7 +172,7 @@ namespace Gzhao_checkout_total
         }
 
         /// <summary>
-        /// Gets the total count of specials in the list.
+        /// Gets the total number of specials in the database.
         /// </summary>
         /// <returns></returns>
         internal static int GetSpecialCount()
@@ -181,11 +181,35 @@ namespace Gzhao_checkout_total
         }
 
         /// <summary>
-        /// Gets a special at the given position.
+        /// Gets a special with the given special ID.
         /// </summary>
         /// <param name="position"></param>
         /// <returns></returns>
         internal static Special GetSpecialAt(int position)
+        {
+            bool match = false;
+            int i = -1;
+
+            Special special = null;
+            
+            while (!match && i < listOfSpecials.Count)
+            {
+                i++;
+                match = listOfSpecials[i].sp_ID == position;
+                if (match)
+                {
+                    special = listOfSpecials[i];
+                }
+            }
+            return special;
+        }
+
+        /// <summary>
+        /// Gets a special with the given special ID.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
+        internal static Special GetSpecialAtPosition(int position)
         {
             return listOfSpecials[position];
         }

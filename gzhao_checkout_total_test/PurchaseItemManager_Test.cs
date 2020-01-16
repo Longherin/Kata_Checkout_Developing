@@ -135,6 +135,9 @@ namespace Gzhao_checkout_total_test
 
             pim.RemoveSpecific("Soup");
 
+            //Three at discount (5 - 3)
+            //Two at normal (5)
+            //For a total of 16.
             Assert.AreEqual(16, pim.TotalPurchase());
         }
 
@@ -168,6 +171,8 @@ namespace Gzhao_checkout_total_test
             pim.Add("candy");
             pim.Add("Candy");
 
+            //soup for 5-3, 2 x 3
+            //candy for 4-2, 2 x 2
             Assert.AreEqual(10, pim.TotalPurchase());
         }
 
@@ -223,7 +228,7 @@ namespace Gzhao_checkout_total_test
             
             pim.Add("flour", 10);
 
-            Assert.AreEqual(30, pim.TotalPurchase());
+            Assert.AreEqual(60, pim.TotalPurchase());
         }
 
         [TestMethod]
@@ -301,6 +306,82 @@ namespace Gzhao_checkout_total_test
             //3 for 6 on soup and 50% off on expensive-est chicken.
             
             Assert.AreEqual(156, pim.TotalPurchase());
+        }
+
+        [TestMethod]
+        public void Test_Buy_By_Weight_Special_Interwoven_Remove()
+        {
+            BuildDataTest();
+
+            PurchaseItemManager pim = new PurchaseItemManager();
+
+            pim.Add("chicken", 10);
+            pim.Add("soup");
+            pim.Add("chiCken", 5);
+            pim.Add("soup");
+            pim.Add("cHicken", 5);
+            pim.Add("soup");
+
+            pim.RemoveSpecific("soup");
+
+            //3 for 6 on soup and 50% off on expensive-est chicken.
+            //Except no soup for you.
+
+            Assert.AreEqual(160, pim.TotalPurchase());
+        }
+
+        [TestMethod]
+        public void Test_Bundle()
+        {
+            BuildDataTest();
+
+            PurchaseItemManager pim = new PurchaseItemManager();
+            
+            pim.Add("flour");
+            pim.Add("flour");
+            pim.Add("flour");
+
+            //Three bags of flour for just $6 as opposed to 18.
+
+            Assert.AreEqual(6, pim.TotalPurchase());
+        }
+
+        [TestMethod]
+        public void Test_Solo_Case()
+        {
+            BuildDataTest();
+            PurchaseItemManager pim = new PurchaseItemManager();
+
+            pim.Add("Carpet");
+
+            Assert.AreEqual(40, pim.TotalPurchase());
+        }
+
+        [TestMethod]
+        public void Test_Limited_Specials()
+        {
+            BuildDataTest();
+            PurchaseItemManager pim = new PurchaseItemManager();
+
+            pim.Add("Carpet");
+            pim.Add("carpet");
+
+            Assert.AreEqual(140, pim.TotalPurchase());
+        }
+
+        [TestMethod]
+        public void Test_Limited_Removed()
+        {
+            BuildDataTest();
+            PurchaseItemManager pim = new PurchaseItemManager();
+
+            pim.Add("Carpet");
+            pim.Add("carpet");
+
+            pim.RemoveSpecific(0);
+
+            
+            Assert.AreEqual(40, pim.TotalPurchase());
         }
     }
 }

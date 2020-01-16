@@ -6,76 +6,73 @@ namespace Gzhao_checkout_total
 {
     /// <summary>
     /// A special is a deal that exists for a certain amount of items.
+    /// Note: Do note try to create this class.
     /// </summary>
     public class Special
     {
+        private static int id_Value = 0;
+        public int sp_ID { get; private set; }
+
         /// <summary>
         /// The name of the item affected.
         /// </summary>
-        public string itemAffected { get; private set; }
+        public string itemAffected { get; protected set; }
         
         /// <summary>
-        /// The type of a special.
-        /// FIXED = Set the affected item(s) to a fixed price.
-        /// PERCENTAGE = Set the affected item(s) to a percentage of their original price.
+        /// How does this special work with the item's cost.
+        /// SET_TO_AMOUNT = Sets the affected items to have the given cost in total.
+        /// REDUCE_BY_PERCENTAGE = Reduces the affected items' cost by the given percentage.
+        /// REDUCE_BY_DOLLAR = Reduces the affected items' costs by the given flat dollar value.
         /// </summary>
-        public enum SPECIAL_TYPE : int {FIXED = 0, PERCENTAGE = 1}
+        public enum DISCOUNT_TYPE : int {SET_TO_AMOUNT = 0, REDUCE_BY_PERCENTAGE = 1, REDUCE_BY_DOLLAR = 2}
+        
+        /// <summary>
+        /// The category of this special.
+        /// NORMAL = affects all items.
+        /// DEFERRED = does not affect the triggering item.
+        /// </summary>
+        public enum SPECIAL_TT : int { NORMAL = 0, DEFERRED = 1}
 
-        /// <summary>
-        /// The type of this special.
-        /// 0 = Fixed price (change price to this value)
-        /// 1 = Percentage price (reduce price by this value)
-        /// </summary>
-        private readonly SPECIAL_TYPE type;
-        
         /// <summary>
         /// The amount that this item is either:
-        /// FIXED = Set to
-        /// PERCENTAGE = Reduced by.
-        /// 
-        /// Note: for PERCENTAGE, 20 = 20% reduction in price.
+        /// SET_TO_AMOUNT = sets the value of all items affected by the special so it equals this.
+        /// REDUCE_BY_PERCENTAGE = reduce each item in the special by this percentage (20 = 20% off).
+        /// REDUCE_BY_DOLLAR = reduce each item in the special by this flat value (20 = 20 dollars from its current cost).
         /// </summary>
-        public float costChange { get; private set; }
-
+        public float itemCostChange { get; protected set; }
+        
         /// <summary>
         /// The amount of items that need to be purchased before this special fires.
         /// </summary>
-        public int activationRequirement { get; private set; }
+        public int itemsNeededToFire { get; protected set; }
 
         /// <summary>
         /// The amount of items that this special applies to.
         /// </summary>
-        public int appliedToAmount { get; private set; }
-
-        public Special()
-        {
-            itemAffected = "_NULL_ITEM";
-            type = SPECIAL_TYPE.FIXED;
-            costChange = 0;
-            activationRequirement = 255;
-            appliedToAmount = 0;
-        }
+        public int itemsApplied { get; protected set; }
 
         /// <summary>
-        /// Creates a new Special Deal with the following parameters:
-        /// The name of the item, 
-        /// The type of the special (fixed or not),
-        /// The change in value for the item,
-        /// How many are needed before the special is applied,
-        /// How many items actually get this special.
+        /// How many items this special can be applied per purchase.
+        /// Defaults to infinite.
         /// </summary>
-        /// <param name="sp_name">The name of the item that this deal affects.</param>
-        /// <param name="specialType">The type of the special.</param>
-        /// <param name="cost">The change in value for this item.</param>
-        /// <param name="activateReq">How many we need before this special is applied.</param>
-        /// <param name="appliedAmt">How many items get applied this special after it activates.</param>
-        public Special(string sp_name, int specialType, float cost, int activateReq, int appliedAmt)
+        public int specialApplyLimit { get; protected set; }
+
+        /// <summary>
+        /// The type of this special (normal or deferred).
+        /// </summary>
+        public SPECIAL_TT special_type { get; protected set; }
+
+        /// <summary>
+        /// How does this special calculate changes to cost?
+        /// flat or percentage or bundled.
+        /// </summary>
+        public DISCOUNT_TYPE discount_type { get; protected set; }
+
+        /// <summary>
+        /// Do not do this.
+        /// </summary>
+        public Special()
         {
-            itemAffected = sp_name;
-            type = (SPECIAL_TYPE)specialType;
-            costChange = cost;
-            activationRequirement = activateReq;
-            appliedToAmount = appliedAmt;
         }
         
         /// <summary>
@@ -91,20 +88,24 @@ namespace Gzhao_checkout_total
         }
 
         /// <summary>
-        /// Returns true if this special is a percentage deal rather than
-        /// a fixed price change.
+        /// Sets the ID of this special. Should be the same as its position
+        /// in the list.
         /// </summary>
-        /// <returns></returns>
-        public bool GetIsPercentage()
+        /// <param name="id_Value"></param>
+        protected void SetID()
         {
-            bool ret = false;
+            sp_ID = id_Value;
+            id_Value++;
+        }
 
-            if(type == SPECIAL_TYPE.PERCENTAGE)
-            {
-                ret = true;
-            }
-
-            return ret;
+        /// <summary>
+        /// Fires when the special is of type FLAT.
+        /// Changes the total so that the total of all values added together becomes equal
+        /// to the given total.
+        /// </summary>
+        protected void CalculateFlatPrice()
+        {
+            itemCostChange /= itemsApplied;
         }
     }
 }
