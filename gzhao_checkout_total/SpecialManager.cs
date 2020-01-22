@@ -48,6 +48,10 @@ namespace Gzhao_checkout_total
                         //the deal. Ergo, it's the header.
                         sri.SetDeferHeader();
                         header = false;
+
+                        //boo boo bandaid.
+                        //to stop the header from eating a fire count.
+                        fireCount++;
                     }
                     else if (!sri.isDiscounted)
                     {

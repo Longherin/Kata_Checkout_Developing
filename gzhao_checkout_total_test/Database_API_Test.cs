@@ -52,5 +52,30 @@ namespace Gzhao_checkout_total_test
 
             Database_API.Clean();
         }
+
+        [TestMethod]
+        public void Test_Add_Special_To_Roster()
+        {
+            Database_Builder.BuildData();
+
+            Database_API.AddItem("Fish", 10);
+            Database_API.AddSpecial(new SpecialNormal("fish", 14, Special.DISCOUNT_TYPE.REDUCE_BY_PERCENTAGE, 2,2));
+
+            Assert.AreEqual(7, Database_API.GetSpecialsCount());
+
+            Database_API.Clean();
+        }
+
+        [TestMethod]
+        public void Test_Add_Special_To_Roster_Replace()
+        {
+            Database_Builder.BuildData();
+
+            Database_API.AddSpecial(new SpecialNormal("candy", 14, Special.DISCOUNT_TYPE.REDUCE_BY_PERCENTAGE, 2, 2));
+
+            Assert.AreEqual(6, Database_API.GetSpecialsCount());
+
+            Database_API.Clean();
+        }
     }
 }

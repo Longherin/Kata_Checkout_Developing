@@ -60,22 +60,26 @@ namespace Gzhao_checkout_total
 
         /// <summary>
         /// Adds an item into the list of Items.
-        /// Duplicates are ignored.
+        /// Duplicates replace the old entry.
         /// </summary>
         /// <param name="newItem"></param>
         internal static void AddItem(Item newItem)
         {
-            int i = 0;
+            int i = -1;
             bool exists = false;
-            while(!exists && i < listOfItems.Count)
+            while(!exists && i+1 < listOfItems.Count)
             {
-                exists = listOfItems[i].Match(newItem.name);
                 i++;
+                exists = listOfItems[i].Match(newItem.name);
             }
 
             if (!exists)
             {
                 listOfItems.Add(newItem);
+            }
+            else
+            {
+                listOfItems[i] = newItem;
             }
         }
 
@@ -124,6 +128,8 @@ namespace Gzhao_checkout_total
         internal static void PurgeItems()
         {
             listOfItems = new List<Item>();
+            listOfSpecials = new List<Special>();
+            Database_Builder.Unbuilt();
         }
 
         /// <summary>
@@ -141,8 +147,7 @@ namespace Gzhao_checkout_total
                 i--;
                 if (listOfSpecials[i].Match(s.itemAffected))
                 {
-                    listOfSpecials.RemoveAt(i);
-                    listOfSpecials.Add(s);
+                    listOfSpecials[i] = s;
                     changed = true;
                 }
             }
@@ -187,21 +192,7 @@ namespace Gzhao_checkout_total
         /// <returns></returns>
         internal static Special GetSpecialAt(int position)
         {
-            bool match = false;
-            int i = -1;
-
-            Special special = null;
-            
-            while (!match && i < listOfSpecials.Count)
-            {
-                i++;
-                match = listOfSpecials[i].sp_ID == position;
-                if (match)
-                {
-                    special = listOfSpecials[i];
-                }
-            }
-            return special;
+            return listOfSpecials[position];
         }
 
         /// <summary>

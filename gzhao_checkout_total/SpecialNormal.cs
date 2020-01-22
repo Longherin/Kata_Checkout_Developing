@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Gzhao_checkout_total
 {
-    class SpecialNormal : Special
+    public class SpecialNormal : Special
     {
         /// <summary>
         /// Creates a special with the given parameters.
@@ -17,7 +17,6 @@ namespace Gzhao_checkout_total
         /// <param name="applyLimit">How many times this special can fire. Defaults to infinite.</param>
         public SpecialNormal(string name,int discount, DISCOUNT_TYPE type, int applyCount, int applyTo, int applyLimit = -1)
         {
-            SetID();
             itemAffected = name;
             discount_type = type;
             itemCostChange = discount;

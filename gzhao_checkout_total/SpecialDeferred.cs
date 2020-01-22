@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Gzhao_checkout_total
 {
-    class SpecialDeferred : Special
+    public class SpecialDeferred : Special
     {
         
         /// <summary>
@@ -18,7 +18,6 @@ namespace Gzhao_checkout_total
         /// <param name="limit">How many times this discount can fire per person (default to infinite).</param>
         public SpecialDeferred(string name, int discount, DISCOUNT_TYPE dt, int limit = -1)
         {
-            SetID();
             itemAffected = name;
             itemCostChange = discount;
             itemsNeededToFire = 1;

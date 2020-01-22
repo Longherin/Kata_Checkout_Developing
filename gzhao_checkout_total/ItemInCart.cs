@@ -9,7 +9,7 @@ namespace Gzhao_checkout_total
         /// <summary>
         /// The item that's being purchased.
         /// </summary>
-        private Item itemRef;
+        private string itemRef;
 
         /// <summary>
         /// the amount of this item that is being purchased.
@@ -32,11 +32,11 @@ namespace Gzhao_checkout_total
         /// <summary>
         /// The special that this item is affected by.
         /// </summary>
-        public int special_ID { get; private set; }
+        public Special special_ID { get; private set; }
 
         public ItemInCart(Item item, float amt = 1)
         {
-            itemRef = item;
+            itemRef = item.name;
             quantity = amt;
         }
         
@@ -50,7 +50,7 @@ namespace Gzhao_checkout_total
             if (!isDiscounted)
             {
                 isDiscounted = true;
-                special_ID = special.sp_ID;
+                special_ID = special;
                 flagSet = true;
             }
 
@@ -72,7 +72,7 @@ namespace Gzhao_checkout_total
         {
             isDeferHeader = false;
             isDiscounted = false;
-            special_ID = -1;
+            special_ID = null;
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace Gzhao_checkout_total
         /// <returns></returns>
         public string GetName()
         {
-            return itemRef.name;
+            return itemRef;
         }
 
         /// <summary>
@@ -102,26 +102,25 @@ namespace Gzhao_checkout_total
         /// <returns></returns>
         public float GetPrice()
         {
-            float total = itemRef.price;
-            if (itemRef.priceByWeight)
+            Item itemdb = Database_API.GetItem(itemRef);
+            float total = itemdb.price;
+            if (itemdb.priceByWeight)
             {
                 total *= quantity;
             }
 
             if (isDiscounted && !isDeferHeader)
             {
-                Special refer = Database_API.GetSpecial(special_ID);
-
-                switch (refer.discount_type)
+                switch (special_ID.discount_type)
                 {
                     case Special.DISCOUNT_TYPE.REDUCE_BY_DOLLAR:
-                        total -= refer.itemCostChange;
+                        total -= special_ID.itemCostChange;
                         break;
                     case Special.DISCOUNT_TYPE.REDUCE_BY_PERCENTAGE:
-                        total *= (100 - refer.itemCostChange) * 0.01f;
+                        total *= (100 - special_ID.itemCostChange) * 0.01f;
                         break;
                     case Special.DISCOUNT_TYPE.SET_TO_AMOUNT:
-                        total = refer.itemCostChange;
+                        total = special_ID.itemCostChange;
                         break;
                 }
             }
@@ -130,8 +129,9 @@ namespace Gzhao_checkout_total
 
         public float GetOriginalPrice()
         {
-            float total = itemRef.price;
-            if (itemRef.priceByWeight)
+            Item itemdb = Database_API.GetItem(itemRef);
+            float total = itemdb.price;
+            if (itemdb.priceByWeight)
             {
                 total *= quantity;
             }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 
 namespace Gzhao_checkout_total
 {
@@ -7,7 +8,7 @@ namespace Gzhao_checkout_total
         /// <summary>
         /// The receipt. Each item on the receipt represents one purchase of some kind.
         /// </summary>
-        private List<ItemInCart> itemRosterAsPurchased;
+        private List<ItemInCart> listOfItems;
 
         /// <summary>
         /// The specials that this purchase applies for.
@@ -34,7 +35,7 @@ namespace Gzhao_checkout_total
         
         public PurchaseItemManager()
         {
-            itemRosterAsPurchased = new List<ItemInCart>();
+            listOfItems = new List<ItemInCart>();
             stm = new SpecialTokenManager();
 
             itemRosterTally = new Dictionary<string, int>();
@@ -50,7 +51,7 @@ namespace Gzhao_checkout_total
         {
             ItemInCart newItem = new ItemInCart(Database_API.GetItem(itemName), itemNumber);
             string itemNameClean = newItem.GetName();
-            itemRosterAsPurchased.Add(newItem);
+            listOfItems.Add(newItem);
 
             if (itemRosterTally.ContainsKey(itemNameClean))
             {
@@ -71,8 +72,8 @@ namespace Gzhao_checkout_total
         /// </summary>
         public void RemoveLast()
         {
-            string name = itemRosterAsPurchased[itemRosterAsPurchased.Count - 1].GetName();
-            itemRosterAsPurchased.RemoveAt(itemRosterAsPurchased.Count - 1);
+            string name = listOfItems[listOfItems.Count - 1].GetName();
+            listOfItems.RemoveAt(listOfItems.Count - 1);
 
             itemRosterTally[name]--;
             itemRosterTallyUsed[name]--;
@@ -86,8 +87,8 @@ namespace Gzhao_checkout_total
         /// <param name="position"></param>
         public void RemoveSpecific(int position)
         {
-            ItemInCart iic = itemRosterAsPurchased[position];
-            itemRosterAsPurchased.RemoveAt(position);
+            ItemInCart iic = listOfItems[position];
+            listOfItems.RemoveAt(position);
 
             itemRosterTally[iic.GetName()]--;
             itemRosterTallyUsed[iic.GetName()]--;
@@ -99,22 +100,22 @@ namespace Gzhao_checkout_total
         /// Removes the most recent entry with the matching name from the item roster.
         /// </summary>
         /// <param name="itemName"></param>
-        public void RemoveSpecific(string itemName)
+        public void RemoveLast(string itemName)
         {
-            int i = itemRosterAsPurchased.Count;
+            int i = listOfItems.Count;
             string name = "";
 
             while(i > 0)
             {
                 i--;
 
-                bool match = itemRosterAsPurchased[i].Match(itemName);
+                bool match = listOfItems[i].Match(itemName);
 
                 if(match)
                 {
-                    name = itemRosterAsPurchased[i].GetName();
+                    name = listOfItems[i].GetName();
 
-                    itemRosterAsPurchased.RemoveAt(i);
+                    listOfItems.RemoveAt(i);
                     
                     break;
                 }
@@ -132,7 +133,7 @@ namespace Gzhao_checkout_total
         /// <returns></returns>
         public int TotalPurchasedEntries()
         {
-            return itemRosterAsPurchased.Count;
+            return listOfItems.Count;
         }
 
         /// <summary>
@@ -142,7 +143,7 @@ namespace Gzhao_checkout_total
         public float TotalPurchase()
         {
             float total = 0;
-            foreach(ItemInCart item in itemRosterAsPurchased)
+            foreach(ItemInCart item in listOfItems)
             {
                 total += item.GetPrice();
             }
@@ -156,7 +157,7 @@ namespace Gzhao_checkout_total
         public float TotalNoSpecialPurchase()
         {
             float t_total = 0;
-            foreach(ItemInCart item in itemRosterAsPurchased)
+            foreach(ItemInCart item in listOfItems)
             {
                 t_total += item.GetOriginalPrice();
             }
@@ -173,6 +174,7 @@ namespace Gzhao_checkout_total
             //TRUE when a deal is either possible or is about to be impossible.
             bool hasSpecial = Database_API.TryGetMatchingDeal(key, itemRosterTallyUsed[key])
                 || itemRosterTallyUsed[key] < 0;
+            bool deferred = false;
             
             bool specialStateReset = false;
             if (hasSpecial)
@@ -190,13 +192,16 @@ namespace Gzhao_checkout_total
                     stm.RemoveToken(special);
                     specialStateReset = true;
                 }
+
+                deferred = special.special_type == Special.SPECIAL_TT.DEFERRED;
             }
 
             //If we're removing, do a purge just in case.
             specialStateReset = state == TALLY_STATE.REMOVE;
 
-            if (specialStateReset)
+            if (specialStateReset || deferred)
             {
+                //Run if we're either removing, or else have a deferred special.
                 PurgeSpecials(key);
             }
             ApplySpecials();
@@ -209,7 +214,7 @@ namespace Gzhao_checkout_total
         /// <returns></returns>
         public ItemInCart GetAtPosition(int pointer)
         {
-            return itemRosterAsPurchased[pointer];
+            return listOfItems[pointer];
         }
 
         /// <summary>
@@ -218,7 +223,7 @@ namespace Gzhao_checkout_total
         /// </summary>
         private void ApplySpecials()
         {
-            SpecialManager.ApplySpecials(itemRosterAsPurchased, stm);
+            SpecialManager.ApplySpecials(listOfItems, stm);
         }
 
         /// <summary>
@@ -226,7 +231,7 @@ namespace Gzhao_checkout_total
         /// </summary>
         private void PurgeSpecials()
         {
-            foreach(ItemInCart item in itemRosterAsPurchased)
+            foreach(ItemInCart item in listOfItems)
             {
                 item.ClearSpecial();
             }
@@ -238,13 +243,42 @@ namespace Gzhao_checkout_total
         /// <param name="key"></param>
         private void PurgeSpecials(string key)
         {
-            foreach(ItemInCart item in itemRosterAsPurchased)
+            foreach(ItemInCart item in listOfItems)
             {
                 if (item.Match(key))
                 {
                     item.ClearSpecial();
                 }
             }
+        }
+
+        /// <summary>
+        /// Displays the receipt of this purchase.
+        /// </summary>
+        /// <param name=""></param>
+        public string GetReceipt(bool showOrdering, bool showSpecials)
+        {
+            StringBuilder builder = new StringBuilder();
+            int counter = 0;
+
+            foreach(ItemInCart item in listOfItems)
+            {
+                if (showOrdering)
+                {
+                    counter++;
+                    builder.Append(DisplayOrganizer.AddBrackets(counter));
+                }
+                //Displays the item and its price.
+                builder.Append(DisplayOrganizer.AddEntry(item.GetName(), 30));
+                builder.AppendLine(DisplayOrganizer.AddEntry(item.GetOriginalPrice().ToString(), 0));
+                //Displays the special and its affects.
+                if (showSpecials && item.isDiscounted)
+                {
+                    builder.AppendLine(DisplayOrganizer.AddSpecial(item.special_ID, 30));
+                }
+            }
+            
+            return builder.ToString();
         }
     }
 }

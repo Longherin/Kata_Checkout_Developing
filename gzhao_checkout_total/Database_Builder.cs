@@ -42,8 +42,17 @@ namespace Gzhao_checkout_total
                 //Deals with a limit
                 Database_API.AddSpecial(new SpecialNormal("Carpet", 60, Special.DISCOUNT_TYPE.REDUCE_BY_DOLLAR, 1, 1, 1));
 
+                //Deals that affect the next item rather than the first one.
+                Database_API.AddSpecial(new SpecialDeferred("Beef", 50, Special.DISCOUNT_TYPE.REDUCE_BY_PERCENTAGE, 1));
+
                 builtSpecials = true;
             }
+        }
+
+        public static void Unbuilt()
+        {
+            builtSpecials = false;
+            builtItems = false;
         }
     }
 }

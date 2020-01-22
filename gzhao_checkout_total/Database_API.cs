@@ -9,6 +9,27 @@ namespace Gzhao_checkout_total
     /// </summary>
     public class Database_API
     {
+
+        /// <summary>
+        /// Returns true if there is already an item in the database
+        /// with the same name.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static bool TryGetItem(string name)
+        {
+            bool result = false;
+
+            int i = 0;
+            while (!result && i < Database.GetItemCount())
+            {
+                result = Database.GetItemAt(i).Match(name);
+                i++;
+            }
+
+            return result;
+        }
+
         /// <summary>
         /// Adds an item to the list of items.
         /// </summary>
@@ -153,7 +174,7 @@ namespace Gzhao_checkout_total
             for(int j = 0; j < i; j++)
             {
                 Special item = Database.GetSpecialAtPosition(j);
-                if(item.Match(name) && item.itemsNeededToFire <= amount)
+                if(item.Match(name) && item.itemsNeededToFire <= amount || amount == -1)
                 {
                     hasDeal = true;
                     break;

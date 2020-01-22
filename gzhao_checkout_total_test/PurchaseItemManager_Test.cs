@@ -133,7 +133,7 @@ namespace Gzhao_checkout_total_test
             pim.Add("soup");
             pim.Add("soup");
 
-            pim.RemoveSpecific("Soup");
+            pim.RemoveLast("Soup");
 
             //Three at discount (5 - 3)
             //Two at normal (5)
@@ -187,7 +187,7 @@ namespace Gzhao_checkout_total_test
             pim.Add("soup");
             pim.Add("soup");
 
-            pim.RemoveSpecific("soup");
+            pim.RemoveLast("soup");
 
             Assert.AreEqual(10, pim.TotalPurchase());
         }
@@ -322,7 +322,7 @@ namespace Gzhao_checkout_total_test
             pim.Add("cHicken", 5);
             pim.Add("soup");
 
-            pim.RemoveSpecific("soup");
+            pim.RemoveLast("soup");
 
             //3 for 6 on soup and 50% off on expensive-est chicken.
             //Except no soup for you.
@@ -382,6 +382,54 @@ namespace Gzhao_checkout_total_test
 
             
             Assert.AreEqual(40, pim.TotalPurchase());
+        }
+
+        [TestMethod]
+        public void Test_Deferred()
+        {
+            BuildDataTest();
+            PurchaseItemManager pim = new PurchaseItemManager();
+            
+            pim.Add("Beef", 10);
+            pim.Add("Beef", 8);
+
+            //10lb beef triggers the special
+            //8lb beef gets the special (half off).
+            Assert.AreEqual(140, pim.TotalPurchase());
+        }
+
+        [TestMethod]
+        public void Test_Deferred_Scale_Up()
+        {
+            BuildDataTest();
+            PurchaseItemManager pim = new PurchaseItemManager();
+
+            pim.Add("Beef", 10);
+            pim.Add("Beef", 8);
+            pim.Add("Beef", 20);
+
+            //10lb beef triggers the special
+            //8lb beef gets the special (half off).
+            //20lb beef then causes itself to be the header, moving the special
+            //from the 8 pounder to the 10 pounder.
+            Assert.AreEqual(330, pim.TotalPurchase());
+        }
+
+        [TestMethod]
+        public void Test_Deferred_Scale_Down()
+        {
+            BuildDataTest();
+            PurchaseItemManager pim = new PurchaseItemManager();
+            
+            pim.Add("Beef", 20);
+            pim.Add("Beef", 10);
+            pim.Add("Beef", 8);
+
+            pim.RemoveSpecific(1);
+            
+            //20 pounder starts. 10 gets the special.
+            //10 then gets removed, so 8 gets the special.
+            Assert.AreEqual(240, pim.TotalPurchase());
         }
     }
 }

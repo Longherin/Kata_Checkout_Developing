@@ -10,9 +10,6 @@ namespace Gzhao_checkout_total
     /// </summary>
     public class Special
     {
-        private static int id_Value = 0;
-        public int sp_ID { get; private set; }
-
         /// <summary>
         /// The name of the item affected.
         /// </summary>
@@ -40,6 +37,12 @@ namespace Gzhao_checkout_total
         /// REDUCE_BY_DOLLAR = reduce each item in the special by this flat value (20 = 20 dollars from its current cost).
         /// </summary>
         public float itemCostChange { get; protected set; }
+
+        /// <summary>
+        /// Used only for set_to_amount deals. to prevent
+        /// weird calculation shenanigans from being revealed.
+        /// </summary>
+        public float preSetAmount { get; private set; }
         
         /// <summary>
         /// The amount of items that need to be purchased before this special fires.
@@ -88,23 +91,13 @@ namespace Gzhao_checkout_total
         }
 
         /// <summary>
-        /// Sets the ID of this special. Should be the same as its position
-        /// in the list.
-        /// </summary>
-        /// <param name="id_Value"></param>
-        protected void SetID()
-        {
-            sp_ID = id_Value;
-            id_Value++;
-        }
-
-        /// <summary>
         /// Fires when the special is of type FLAT.
         /// Changes the total so that the total of all values added together becomes equal
         /// to the given total.
         /// </summary>
         protected void CalculateFlatPrice()
         {
+            preSetAmount = itemCostChange;
             itemCostChange /= itemsApplied;
         }
     }
